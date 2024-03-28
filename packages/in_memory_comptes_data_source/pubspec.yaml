@@ -1,0 +1,19 @@
+name: in_memory_comptes_data_source
+description: An in-memory implementation of the ComptesDataSource interface.
+version: 0.1.0+1
+publish_to: none
+
+environment:
+  sdk: '>=3.0.0 <4.0.0'
+
+dependencies:
+  collection: ^1.18.0
+  comptes_data_source:
+    path: ../comptes_data_source
+  firedart: ^0.9.8
+  uuid: ^4.0.0
+
+dev_dependencies:
+  mocktail: ^1.0.0
+  test: ^1.19.2
+  very_good_analysis: ^5.0.0

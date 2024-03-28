@@ -1,0 +1,28 @@
+name: api_sport_rider
+description: An new Dart Frog application
+version: 1.0.0+1
+publish_to: none
+
+environment:
+  sdk: '>=3.0.0 <4.0.0'
+
+dependencies:
+  dart_frog: ^1.0.0
+  http: ^0.13.3
+  in_memory_comptes_data_source:
+    path: packages/in_memory_comptes_data_source
+  comptes_data_source:
+    path: packages/comptes_data_source
+  orm: ^4.0.1
+  firedart: ^0.9.7
+
+dev_dependencies:
+  build_runner: ^2.4.8
+  http: ^0.13.3
+  json_serializable: ^6.7.1
+  mocktail: ^1.0.0
+  test: ^1.19.2
+  very_good_analysis: ^5.0.0
+
+dependency_overrides:
+  uuid: ^4.3.3
