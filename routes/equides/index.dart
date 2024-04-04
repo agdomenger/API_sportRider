@@ -18,6 +18,9 @@ FutureOr<Response> onRequest(RequestContext context) async {
   }
 }
 
+/*
+recuperer la liste d'équidé du compte fourni
+parametre obligatoire: l'id du compte */
 Future<Response> _get(RequestContext context) async {
   final Map<String, dynamic> requestBody =
       (await context.request.json()) as Map<String, dynamic>;
@@ -41,6 +44,10 @@ Future<Response> _get(RequestContext context) async {
   }
 }
 
+/*
+création d'un équidé pour un compte fourni
+l'id du compte est essentiel 
+ */
 Future<Response> _post(RequestContext context) async {
   try {
     final Map<String, dynamic> requestBody =
@@ -55,12 +62,10 @@ Future<Response> _post(RequestContext context) async {
 
         final dynamic equidesJsonDynamic = requestBody['equides'];
         if (equidesJsonDynamic == null || equidesJsonDynamic is! List) {
-          print("ptn oui c'est là");
           return Response(
             statusCode: HttpStatus.badRequest,
           );
         }
-
         final List<dynamic> equidesJsonList = equidesJsonDynamic;
         final List<Map<String, dynamic>> equidesJson =
             equidesJsonList.cast<Map<String, dynamic>>();
@@ -75,26 +80,27 @@ Future<Response> _post(RequestContext context) async {
 
         return Response.json(body: updatedEquides);
       } else {
-        // Handle the case where 'compteId' is not a String
         return Response(
           statusCode: HttpStatus.badRequest,
         );
       }
     } else {
-      // Handle the case where 'compteId' is not present in the request body
       return Response(
         statusCode: HttpStatus.badRequest,
       );
     }
   } catch (e) {
     print('Error: $e');
-    // Handle JSON parsing or other errors
     return Response(
       statusCode: HttpStatus.badRequest,
     );
   }
 }
 
+/*
+pour le modifier 
+non utilisé actuellement
+ */
 Future<Response> _put(RequestContext context) async {
   final Map<String, dynamic> requestBody =
       (await context.request.json()) as Map<String, dynamic>;
@@ -118,6 +124,9 @@ Future<Response> _put(RequestContext context) async {
   }
 }
 
+/*
+le supprimer 
+ */
 Future<Response> _delete(RequestContext context) async {
   final Map<String, dynamic> requestBody =
       (await context.request.json()) as Map<String, dynamic>;

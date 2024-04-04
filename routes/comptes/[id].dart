@@ -2,7 +2,7 @@ import 'dart:async';
 import 'dart:io';
 
 import 'package:comptes_data_source/comptes_data_source.dart';
-import 'package:dart_frog/dart_frog.dart'; // Importez la fonction getUserInfoById
+import 'package:dart_frog/dart_frog.dart';
 
 FutureOr<Response> onRequest(RequestContext context, String id) async {
   final dataSource = context.read<ComptesDataSource>();
@@ -27,27 +27,35 @@ FutureOr<Response> onRequest(RequestContext context, String id) async {
   }
 }
 
+/*
+fonction permetant la récupération des informations relative à l'ID fournit 
+ */
 Future<Response> _get(RequestContext context, String id) async {
   final dataSource = context.read<ComptesDataSource>();
   try {
-    // Obtenez les informations de l'utilisateur par son ID
+    // Obtenez les informations de l'utilisateur par son ID de document reference dans firebase
     final userInfo = await dataSource.getUserInfoById(id);
 
     if (userInfo != null) {
-      // Retournez les informations de l'utilisateur sous forme de réponse JSON
+      // Retournez les informations de l'utilisateur au format JSON
       return Response.json(body: userInfo);
     } else {
-      // Si aucun utilisateur n'est trouvé, retournez un message approprié
+      // Si aucun utilisateur n'est trouvé
       return Response(statusCode: HttpStatus.notFound, body: 'User not found.');
     }
   } catch (e) {
-    // Si une erreur se produit lors de la récupération des informations de l'utilisateur, retournez un message d'erreur
+    // Si une erreur se produit lors de la récupération des informations de l'utilisateur
+
     return Response(
         statusCode: HttpStatus.internalServerError,
         body: 'Error getting user information: $e');
   }
 }
 
+/*
+Fonction pour modifier un compte utilisateur 
+pas utilisé dans le code à ce jour mais potentiellement utile 
+ */
 Future<Response> _put(RequestContext context, String id, Compte compte) async {
   final dataSource = context.read<ComptesDataSource>();
   final updatedCompte = Compte.fromJson(
@@ -64,6 +72,8 @@ Future<Response> _put(RequestContext context, String id, Compte compte) async {
   return Response.json(body: newCompte);
 }
 
+/*
+fonction permettant de supprimer un compte */
 Future<Response> _delete(RequestContext context, String id) async {
   final dataSource = context.read<ComptesDataSource>();
   await dataSource.delete(id);

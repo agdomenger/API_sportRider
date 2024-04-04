@@ -5,6 +5,10 @@ import 'package:uuid/uuid.dart';
 import 'package:meta/meta.dart';
 part 'equide.g.dart';
 
+/*
+Un équidé est composé de : 
+un nom, une année de naissance mais aussi un nom d'élevage qu'on peut ajouter un un type d'epreuve
+ */
 @immutable
 @JsonSerializable()
 class Equide extends Equatable {
@@ -14,15 +18,13 @@ class Equide extends Equatable {
     required this.nom,
     required this.anneeNaissance,
     this.epreuves,
-    // Autres propriétés de l'équidé
-  }) : id = id ?? const Uuid().v4();
+  }) : id = id ?? const Uuid().v4(); //id généré automatiquement
 
   final String? id;
   final String? elevage;
   final String nom;
   final int anneeNaissance;
   late List<Epreuve>? epreuves;
-  // Ajoutez d'autres propriétés nécessaires
 
   static Equide fromJson(Map<String, dynamic> json) => _$EquideFromJson(json);
 

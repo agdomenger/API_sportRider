@@ -8,6 +8,9 @@ import 'package:comptes_data_source/src/models/evenement.dart';
 /// * U - Update
 /// * D - Delete
 abstract class ComptesDataSource {
+  /* toutes les fonctions qui sont appelées dans les routes */
+  //les fonctions sont initialisées dans le in_memory
+
   Future<List<Compte>> readAll();
 
   Future<Compte?> create(Compte cmpt);

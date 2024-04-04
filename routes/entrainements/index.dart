@@ -18,14 +18,16 @@ FutureOr<Response> onRequest(RequestContext context) async {
   }
 }
 
+/*
+route permettant de retourner tout les entrainements créés */
 Future<Response> _get(RequestContext context) async {
   final dataSource = context.read<ComptesDataSource>();
-
   final exercices = await dataSource.readAllEntrainements();
-  // Vous pouvez ajuster la réponse en fonction de vos besoins
   return Response.json(body: exercices);
 }
 
+/*
+requête permettant de créer un entrainement pour un compte fournit*/
 Future<Response> _post(RequestContext context) async {
   final dataSource = context.read<ComptesDataSource>();
   try {
@@ -35,7 +37,6 @@ Future<Response> _post(RequestContext context) async {
     if (requestBody.containsKey('compteId')) {
       final dynamic compteIdDynamic = requestBody['compteId'];
 
-      // Perform a runtime type check (cast) to ensure it's a String
       if (compteIdDynamic is String) {
         final String compteId = compteIdDynamic;
         final List<String> exerciceIds =
@@ -43,15 +44,11 @@ Future<Response> _post(RequestContext context) async {
                     ?.map((id) => id as String)
                     ?.toList() ??
                 [];
-
-        // You might want to validate the list of IDs here if needed
-
         return Response.json(
           statusCode: HttpStatus.created,
           body: await dataSource.createEntrainement(compteId, exerciceIds),
         );
       } else {
-        // Handle the case where 'compteId' is not a String
         return Response(
           statusCode: HttpStatus.badRequest,
         );
@@ -66,7 +63,6 @@ Future<Response> _post(RequestContext context) async {
       );
     }
   } catch (e) {
-    // Handle JSON parsing or other errors
     return Response(
       statusCode: HttpStatus.badRequest,
     );
@@ -75,7 +71,7 @@ Future<Response> _post(RequestContext context) async {
 
 
 /*
- requêtes sur les exercices :
+ requêtes sur les entrainements :
 
 
 curl --request POST \

@@ -11,6 +11,12 @@ import 'package:crypto/crypto.dart';
 import 'package:meta/meta.dart';
 part 'comptes.g.dart';
 
+/*
+un compte contient : 
+obligatoirement un email et un mot de passe
+pour le completer, un nom, un prenom, une liste d'evenement, une liste d'equides, une liste d'entraitenements
+ces champs seront remplis par la suite, lors de l'utilisation de l'app
+ */
 @immutable
 @JsonSerializable()
 class Compte extends Equatable {
@@ -36,7 +42,7 @@ class Compte extends Equatable {
   String passwordHash;
   String? salt;
 
-  // Nouvelle méthode pour définir le mot de passe avec hachage et sel
+  //méthode pour définir le mot de passe avec hachage et sel
   void setPassword(String password) {
     final Uint8List randomBytes = Uint8List(32);
     final Random secureRandom = Random.secure();
@@ -51,14 +57,14 @@ class Compte extends Equatable {
     this.salt = salt;
   }
 
-  // Nouvelle méthode pour vérifier le mot de passe
+  // méthode pour vérifier le mot de passe
   bool checkPassword(String password) {
     final String hashedPassword = _hashPassword(password, salt!);
     print("hashed: " + hashedPassword);
     return hashedPassword == passwordHash;
   }
 
-  // Nouvelle méthode interne pour hacher le mot de passe
+  // méthode pour hacher le mot de passe
   String _hashPassword(String password, String salt) {
     final String combined = '$password$salt';
     final List<int> bytes = utf8.encode(combined);

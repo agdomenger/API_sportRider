@@ -16,20 +16,23 @@ Future<dynamic> onRequest(RequestContext context) async {
   }
 }
 
+/*
+deconnecter l'utilisateur
+ */
 Future<FutureOr<Response>> _getLogout(RequestContext context) async {
   try {
     final dataSource = context.read<ComptesDataSource>();
 
-    // Appelez la méthode logoutUser de votre service d'authentification
+    // Appelez la méthode logoutUser qui gere la deconection du token firebase
     await dataSource.logoutUser();
 
-    // Retournez une réponse indiquant que la déconnexion a réussi
+    // deco réussie
     return Response(
       statusCode: HttpStatus.ok,
       body: 'Déconnexion réussie',
     );
   } catch (e) {
-    // En cas d'erreur, retournez une réponse d'erreur
+    // En cas d'erreur
     return Response(
       statusCode: HttpStatus.internalServerError,
       body: 'Une erreur s\'est produite lors de la déconnexion',

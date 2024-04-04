@@ -3,6 +3,7 @@ import 'package:json_annotation/json_annotation.dart';
 import 'package:meta/meta.dart';
 part 'exercices.g.dart';
 
+//liste des catégories que l'on peut affilier à un exercice
 enum CATEGORIES {
   deb_moins16,
   deb_16_40,
@@ -18,6 +19,10 @@ enum CATEGORIES {
   prot_plus40,
 }
 
+/*
+un exercice c'est un status : fait ou opas fait 
+une catégorie et une description 
+ */
 @immutable
 @JsonSerializable()
 class Exercice extends Equatable {

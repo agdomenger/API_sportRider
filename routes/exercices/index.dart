@@ -18,21 +18,26 @@ FutureOr<Response> onRequest(RequestContext context) async {
   }
 }
 
+/*
+renvoie la liste des exercices contenus et disponible dans l'app
+ce n'est pas lié à un compte 
+ */
 Future<Response> _get(RequestContext context) async {
   final dataSource = context.read<ComptesDataSource>();
 
   final exercices = await dataSource.readAllExercice();
-  // Vous pouvez ajuster la réponse en fonction de vos besoins
   return Response.json(body: exercices);
 }
 
+/*
+créer un exercice 
+ */
 Future<Response> _post(RequestContext context) async {
   final dataSource = context.read<ComptesDataSource>();
   try {
     final exoJson = await context.request.json() as Map<String, dynamic>;
-    print("1");
     final exo = Exercice.fromJson(exoJson);
-    print("2");
+    print("///////////////////////////////////////////////");
     return Response.json(
       statusCode: HttpStatus.created,
       body: await dataSource.createExercice(exo),

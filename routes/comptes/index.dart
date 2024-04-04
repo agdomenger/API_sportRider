@@ -1,6 +1,5 @@
 import 'dart:async';
 import 'dart:io';
-import 'package:firedart/firedart.dart';
 import 'package:comptes_data_source/comptes_data_source.dart';
 import 'package:dart_frog/dart_frog.dart';
 
@@ -19,11 +18,14 @@ FutureOr<Response> onRequest(RequestContext context) async {
   }
 }
 
+/*
+methode permettant de récupérer l'intégralité des comptes ayant été créés */
 Future<Response> _get(RequestContext context) async {
   final dataSource = context.read<ComptesDataSource>();
   final email = context.request.uri.queryParameters['email'];
   final password = context.request.uri.queryParameters['password'];
 
+  // lors de la connexion on fournit mdp et email
   if (email != null && password != null) {
     // Recherche du compte avec les informations fournies
     final existingCompte =
@@ -31,21 +33,21 @@ Future<Response> _get(RequestContext context) async {
 
     if (existingCompte != null) {
       // Le compte existe
-      // Vous pouvez ajuster la réponse en fonction de vos besoins
       return Response.json(body: {"message": "Compte existe"});
     } else {
       // Aucun compte trouvé avec les informations fournies
-      // Vous pouvez ajuster la réponse en fonction de vos besoins
       return Response.json(body: {"message": "Compte non trouvé"});
     }
   } else {
     // Si aucun email et mot de passe n'est fourni, récupérez tous les comptes
     final comptes = await dataSource.readAll();
-    // Vous pouvez ajuster la réponse en fonction de vos besoins
     return Response.json(body: comptes);
   }
 }
 
+/*
+requête permettant de créer un compte 
+ */
 Future<Response> _post(RequestContext context) async {
   final dataSource = context.read<ComptesDataSource>();
   try {

@@ -10,6 +10,13 @@ import 'package:crypto/crypto.dart';
 import 'package:meta/meta.dart';
 part 'evenement.g.dart';
 
+/*
+un evenement c'est : 
+une date et un titre
+on peut y ajouter une description 
+mais aussi un cheval, on utilisera ça plus tard dans l'application
+le champ public sera utile plus tard pour proposer des evenement à tout les comptes
+ */
 @immutable
 @JsonSerializable()
 class Evenement extends Equatable {

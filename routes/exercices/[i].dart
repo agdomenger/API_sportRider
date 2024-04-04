@@ -34,18 +34,22 @@ FutureOr<Response> onRequest(
   }
 }
 
+/*
+non utilisé, a modifier pour plus tard 
+ */
 Future<Response> _get(RequestContext context, dynamic exercice) async {
   try {
-    // Retournez les informations de l'exercice sous forme de réponse JSON
     return Response.json(body: exercice);
   } catch (e) {
-    // Si une erreur se produit lors de la récupération des informations de l'exercice, retournez un message d'erreur
     return Response(
         statusCode: HttpStatus.internalServerError,
         body: 'Error getting exercice information: $e');
   }
 }
 
+/*
+idem, n'est pas utilisé pour l'instant
+ */
 Future<Response> _put(
     RequestContext context, String id, int index, String idCmpt) async {
   try {
@@ -58,8 +62,7 @@ Future<Response> _put(
         body: 'Missing required parameters in request body',
       );
     }
-
-    // Mettez à jour l'exercice avec les données fournies
+    // Mettre à jour l'exercice avec les données fournies
     final newExercice =
         await dataSource.updateExercice(id, index, idCmpt, true);
 

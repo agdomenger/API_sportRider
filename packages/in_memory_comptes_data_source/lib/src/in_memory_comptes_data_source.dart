@@ -7,9 +7,11 @@ import 'package:uuid/uuid.dart';
 /// An in-memory implementation of the [ComptesDataSource] interface.
 class InMemoryComptesDataSource implements ComptesDataSource {
   /// Map of ID -> Comptes
-  ///
+  // créer une instance firestore
   final Firestore _firestore = Firestore.instance;
 
+/*
+fonction permetant de récuperer l'insatnce de l'utilisateur courent */
   Future<dynamic> getCurrentUser() async {
     try {
       var currentUser = await FirebaseAuth.instance.getUser();
@@ -20,6 +22,9 @@ class InMemoryComptesDataSource implements ComptesDataSource {
     }
   }
 
+/*
+fonction de création du compte
+ */
   @override
   Future<Compte> create(Compte cmpt) async {
     try {
@@ -46,6 +51,9 @@ class InMemoryComptesDataSource implements ComptesDataSource {
     }
   }
 
+/*
+fonction renvoyant tout les comptes existants 
+*/
   Future<List<Compte>> readAll() async {
     try {
       final List<Compte> comptes = [];
@@ -62,6 +70,8 @@ class InMemoryComptesDataSource implements ComptesDataSource {
     }
   }
 
+/*
+retourne les informations de l'utilisateur à partir de son ID */
   Future<Map<String, dynamic>?> getUserInfoById(String userId) async {
     try {
       final snapshot =
@@ -79,22 +89,23 @@ class InMemoryComptesDataSource implements ComptesDataSource {
     }
   }
 
+/*
+renvoie les infos du document firebase à partir de l'id du compte
+ */
   @override
   Future<Compte?> read(String id) async {
     try {
-      // Instantiate a reference to a specific document in the 'comptes' collection
-
+      // récuperation du document firebase representant le compte
       DocumentReference documentRef =
           Firestore.instance.collection("comptes").document(id);
 
       var document = await documentRef.get();
-      // Check if the document exists
+      // regarder si ce document existe
       if (document != null) {
         var dataa = document.map;
         final Compte compte = Compte.fromJson(dataa);
         return compte;
       } else {
-        // Document does not exist
         print('Document does not exist');
         return null;
       }
@@ -104,6 +115,9 @@ class InMemoryComptesDataSource implements ComptesDataSource {
     }
   }
 
+/*
+supprimer un compte 
+ */
   @override
   Future<void> delete(String id) async {
     await Firestore.instance
@@ -115,6 +129,9 @@ class InMemoryComptesDataSource implements ComptesDataSource {
     });
   }
 
+/*
+trouve  et renvoie l'insatnce associée à un compte à partir de son email et mot de passe 
+ */
   @override
   Future<Compte?> findCompteByEmailAndPassword(
       String email, String password) async {
@@ -145,21 +162,22 @@ class InMemoryComptesDataSource implements ComptesDataSource {
     }
   }
 
+/*
+création d'un entrainement à partir de l'id du compte concerné et d'une liste d'id d'exercices
+ */
   @override
   Future<List<Entrainement>?> createEntrainement(
       String compteId, List<String> exerciceIds) async {
     try {
-      // Get a reference to the specific document in the 'comptes' collection
-      print('Compte ID: $compteId');
+      // recuperer le document firebase associé au compte
       var documentRef =
           Firestore.instance.collection('comptes').document(compteId);
 
-      // Get the current data of the document
+      // recuperer les information du document
       var documentSnapshot = await documentRef.get();
       Map<String, dynamic> data = documentSnapshot.map ?? {};
       print('Document Data: $data');
 
-      // Extract the 'entrainements' field from the data, or return an empty list if it doesn't exist
       List<Map<String, dynamic>> entrainementsData = [];
 
       if (data['entrainements'] is List<dynamic>) {
@@ -167,9 +185,7 @@ class InMemoryComptesDataSource implements ComptesDataSource {
             .map((item) => item as Map<String, dynamic>)
             .toList();
       }
-      print('1');
 
-      // Fetch the exercices from Firebase based on the provided exerciceIds
       List<Exercice> selectedExercices = [];
 
       for (String exerciceId in exerciceIds) {
@@ -180,34 +196,30 @@ class InMemoryComptesDataSource implements ComptesDataSource {
         Map<String, dynamic> exerciceData = exerciceSnapshot.map ?? {};
         selectedExercices.add(Exercice.fromJson(exerciceData));
       }
-      print('2');
-
       print(selectedExercices.toString());
 
-      // If the selectedExercices is not empty, create and add an Entrainement
+      //si la liste existe
       if (selectedExercices.isNotEmpty) {
-        // Create a new Entrainement object
+        //creer un entrainement
         final entrainement = Entrainement(
           compteId: compteId,
           exerciceIds: selectedExercices,
         );
-        print('3');
-        // Combine the existing list with the new entrainement
+        // combiné la liste existante et celle que l'on veut ajouter
         List<Map<String, dynamic>> updatedEntrainements = [
           ...entrainementsData,
           entrainement.toJson(),
         ];
-        print('4');
 
-        // Update the document in Firebase with the new entrainements
+        // mettre a jour le doc firebase
         await documentRef.update({'entrainements': updatedEntrainements});
         print('5');
         return updatedEntrainements
             .map((json) => Entrainement.fromJson(json))
             .toList();
       } else {
-        // No valid exercices found for the given ids
-        return Future.error('No valid exercices found for the given ids');
+        // pas d'exercice ids
+        return Future.error('les ids exercices fournis ne sont pas valident ');
       }
     } catch (e) {
       // Handle errors
@@ -216,6 +228,9 @@ class InMemoryComptesDataSource implements ComptesDataSource {
     }
   }
 
+/*
+créer un exercice
+ */
   @override
   Future<Exercice> createExercice(Exercice exercice) async {
     try {
@@ -239,6 +254,9 @@ class InMemoryComptesDataSource implements ComptesDataSource {
     }
   }
 
+/*
+créer une epreuve
+ */
   @override
   Future<Epreuve> createEpreuve(Epreuve epreuve) async {
     try {
@@ -251,7 +269,6 @@ class InMemoryComptesDataSource implements ComptesDataSource {
         'categorie': createdEpreuve.categorie.toString().split('.').last,
         'discipline': createdEpreuve.discipline.toString().split('.').last,
         'niveau': createdEpreuve.niveau.toString().split('.').last,
-        // Add other fields as needed
       });
 
       return createdEpreuve;
@@ -262,18 +279,20 @@ class InMemoryComptesDataSource implements ComptesDataSource {
     }
   }
 
+/*
+récupération de tout les exercices existants
+ */
   Future<List<String>> readAllExercice() async {
     try {
       final List<String> exerciceIds = [];
 
-      // Obtenez la référence de la collection 'exercices'
+      // Référence de la collection 'exercices'
       final CollectionReference exercicesRef =
           Firestore.instance.collection('exercices');
 
-      // Obtenez tous les documents de la collection 'exercices'
+      // Otous les documents de la collection 'exercices'
       final Page<Document> page = await exercicesRef.get();
 
-      // Convertissez la page en liste de documents et récupérez les IDs de chaque document
       final List<Document> documents = await page.toList();
       for (final Document document in documents) {
         exerciceIds.add(document.id);
@@ -286,13 +305,17 @@ class InMemoryComptesDataSource implements ComptesDataSource {
     }
   }
 
+/*
+renvoie tout les entrainements existants 
+pas vraiment d'utilité pour l'instant en fait
+ */
   @override
   Future<List<Map<String, dynamic>>?> readAllEntrainements() async {
     try {
       final List<Map<String, dynamic>> entrainementsDetails = [];
-      // Assuming 'comptes' is the collection containing the entrainements
       var querySnapshot =
           await Firestore.instance.collection('comptes').get().then((event) {
+        //parcourir tous les comptes
         for (final doc in event) {
           final Map<String, dynamic> compteData = doc.map ?? {};
           final List<Map<String, dynamic>> entrainementsList =
@@ -311,29 +334,28 @@ class InMemoryComptesDataSource implements ComptesDataSource {
       });
       return entrainementsDetails;
     } catch (e) {
-      // Handle any errors
       print('Error retrieving entrainements details: $e');
       throw e;
     }
   }
 
+/*
+renvoie tout les entrainements d'un compte 
+ */
   @override
   Future<List<Entrainement>?> readAllEntrainementsCompte(
       String compteId) async {
     try {
-      // Instantiate a reference to a specific document in the 'comptes' collection
       var documentRef = _firestore.collection('comptes').document(compteId);
-
-      // Get the document snapshot
       var documentSnapshot = await documentRef.get();
 
-      // Check if the document exists
+      //si le doc existe
       if (documentSnapshot != null) {
-        // Extract the 'entrainements' field from the document data
+        //recuperer les entrainements
         List<dynamic>? entrainementsData =
             documentSnapshot.map?['entrainements'] as List<dynamic>?;
         if (entrainementsData != null) {
-          // Convert the raw data into a List<Entrainement>
+          // convertir en liste d'entrainement
           List<Entrainement> entrainements = entrainementsData
               .map((entrainement) =>
                   Entrainement.fromJson(entrainement as Map<String, dynamic>))
@@ -341,11 +363,11 @@ class InMemoryComptesDataSource implements ComptesDataSource {
 
           return entrainements;
         } else {
-          // No 'entrainements' field found in the document
+          // pas d'entrainement trouvé
           return [];
         }
       } else {
-        // Document does not exist
+        // Document n'existe pas
         print('Document does not exist');
         return null;
       }
@@ -355,21 +377,22 @@ class InMemoryComptesDataSource implements ComptesDataSource {
     }
   }
 
+/*
+récuperer tout les équidés d'un compte */
   @override
   Future<List<Equide>?> readAllEquides(String cmptId) async {
     try {
-      // Get a reference to the specific document in the 'comptes' collection
+      // recuperer la reference du compte
       DocumentReference documentRef =
           Firestore.instance.collection('comptes').document(cmptId);
-      // Get the current data of the document
+      // récupération des infos
       var documentSnapshot = await documentRef.get();
       Map<String, dynamic> data = documentSnapshot.map ?? {};
 
-      // Extract the 'equides' field from the data, or return null if it doesn't exist
+      // récuperer les equides
       List<Map<String, dynamic>>? equidesData =
           data['equides'] as List<Map<String, dynamic>>?;
 
-      // If 'equides' field exists, convert it to a list of Equide objects
       if (equidesData != null) {
         List<Equide> equides = equidesData
             .map((equideData) => Equide.fromJson(equideData))
@@ -379,83 +402,84 @@ class InMemoryComptesDataSource implements ComptesDataSource {
         return null;
       }
     } catch (e) {
-      // Handle errors
       print('Error reading equides for compte with id $cmptId: $e');
       throw e;
     }
   }
 
+/*
+supprimer tous les equides du compte 
+ */
   @override
   Future<void> removeAllEquides(String cmptId) async {
     try {
-      // Get a reference to the specific document in the 'comptes' collection
+      //récupération de la réference du compte
       DocumentReference documentRef =
           Firestore.instance.collection('comptes').document(cmptId);
-      // Update the 'equides' field in the document with an empty list
+      //mise a jour de la liste dans firebase
       await documentRef.update({'equides': []});
     } catch (e) {
-      // Handle errors
       print('Error removing all equides for compte with id $cmptId: $e');
       throw e;
     }
   }
 
+/*
+supprimer un équidé spécifique du compte
+ */
   @override
   Future<void> removeOneEquide(String cmptId, String equideId) async {
     try {
-      // Get a reference to the specific document in the 'comptes' collection
+      //récuperer la réference du compte
       DocumentReference documentRef =
           Firestore.instance.collection('comptes').document(cmptId);
-      // Get the current data of the document
+      // récuperer les données
       var documentSnapshot = await documentRef.get();
       Map<String, dynamic> data = documentSnapshot.map ?? {};
 
-      // Extract the equides field from the data, or create an empty list if it doesn't exist
+      // récuperer la liste des equides
       List<Map<String, dynamic>> currentEquides =
           (data['equides'] as List<Map<String, dynamic>>?) ?? [];
 
-      // Remove the equide with the specified id from the list
+      // supprimer le chavl ayant l'id fourni
       currentEquides.removeWhere((equide) => equide['id'] == equideId);
 
-      // Update the 'equides' field in the document with the modified list
+      //mise a jour dans firebase
       await documentRef.update({'equides': currentEquides});
     } catch (e) {
-      // Handle errors
       print('Error removing equide with id $equideId: $e');
       throw e;
     }
   }
 
+/*
+ajouter une nouvelle liste d'équide
+ */
   @override
   Future<List<Equide>?> addNewListeEquide(
       String cmptId, List<Equide> equides) async {
     try {
-      // Get a reference to the specific document in the 'comptes' collection
+      // récuperer la réference
       DocumentReference documentRef =
           Firestore.instance.collection('comptes').document(cmptId);
 
-      // Get the current data of the document
+      // récuperer les données
       var documentSnapshot = await documentRef.get();
       Map<String, dynamic> data = documentSnapshot.map ?? {};
-
-      // Extract the equides field from the data, or create an empty list if it doesn't exist
       List<Map<String, dynamic>> currentEquides = [];
 
       if (data.containsKey('equides') && data['equides'] is List) {
-        // Vérifiez d'abord que 'equides' est de type List avant de le convertir
         currentEquides =
             (data['equides'] as List?)?.cast<Map<String, dynamic>>() ?? [];
       }
 
       print('Current Equides: $currentEquides');
-
-      // Convert the Equide objects to a list of Map<String, dynamic>
       List<Map<String, dynamic>> newEquides =
           equides.map((equide) => equide.toJson()).toList();
 
       print('New Equides: $newEquides');
 
-      // Combine the current and new equides lists
+// fusionner la liste existante et la nouvelle
       List<Map<String, dynamic>> updatedEquides = [
         ...currentEquides,
         ...newEquides
@@ -463,25 +487,27 @@ class InMemoryComptesDataSource implements ComptesDataSource {
 
       print('Updated Equides: $updatedEquides');
 
-      // Update the 'equides' field in the document with the combined list
       await documentRef.update({'equides': updatedEquides});
 
-      // Return the updated list of equides
       return updatedEquides
           .map((equideData) => Equide.fromJson(equideData))
           .toList();
     } catch (e) {
-      // Handle errors
       print('Error adding new list of equides: $e');
       throw e;
     }
   }
 
+/*
+supprimer une epreuve 
+non implémenter
+ */
   @override
   Future<void> deleteEpreuve(String chevalId, String epreuveId) {
     throw UnimplementedError();
   }
 
+/*récupération de toutes les epreuves crées*/
   @override
   Future<List<Epreuve>?> readAllEpreuves(String cmptId, String idCheval) async {
     try {
@@ -521,6 +547,9 @@ class InMemoryComptesDataSource implements ComptesDataSource {
     }
   }
 
+/*
+récuperer tous les evenements 
+ */
   @override
   Future<List<Evenement>> readAllEvenements(String cmptId) async {
     try {
@@ -543,11 +572,12 @@ class InMemoryComptesDataSource implements ComptesDataSource {
     }
   }
 
-  @override
+/*
+ajouter une evenement 
+ */
   @override
   Future<List<Evenement>?> addEvenement(String userId, Evenement event) async {
     try {
-      print("hello");
       // Récupérer le document du compte à partir de son ID
       final accountRef = _firestore.collection('comptes').document(userId);
       final accountDoc = await accountRef.get();
@@ -590,6 +620,9 @@ class InMemoryComptesDataSource implements ComptesDataSource {
     }
   }
 
+/*
+ajouter une epreuve à un cheval
+ */
   @override
   Future<Epreuve?> addEpreuve(
       String userId, String chevalId, List<String> epreuveIds) async {
@@ -599,7 +632,7 @@ class InMemoryComptesDataSource implements ComptesDataSource {
           await Firestore.instance.collection('comptes').document(userId).get();
       final Map<String, dynamic> compteData = documentSnapshot.map ?? {};
 
-      // Assurez-vous que le cheval existe
+      // vérifier que le cheval existe
       if (compteData['equides'] == null) {
         return Future.error('Cheval not found');
       }
@@ -642,6 +675,10 @@ class InMemoryComptesDataSource implements ComptesDataSource {
     }
   }
 
+/*
+mettre à jour un exercice
+non utilisé 
+ */
   Future<void> updateExercice(
       String id, int index, String idCpt, bool statusExo) async {
     try {
@@ -669,17 +706,17 @@ class InMemoryComptesDataSource implements ComptesDataSource {
             exercices.indexWhere((exercice) => exercice['id'] == id);
 
         if (exerciceIndex != -1) {
-          // Mettez à jour le champ status de l'exercice existant avec la nouvelle valeur
+          // Mettre à jour le champ status de l'exercice existant avec la nouvelle valeur
           exercices[exerciceIndex]['status'] = statusExo;
 
-          // Mettez à jour les données de l'entraînement avec les exercices mis à jour
+          // Mettre à jour les données de l'entraînement avec les exercices mis à jour
           entrainement['exerciceIds'] = exercices;
 
-          // Mettez à jour les données du compte avec l'entraînement mis à jour
+          // Mettre à jour les données du compte avec l'entraînement mis à jour
           entrainements[index] = entrainement;
           print("entrainement : $entrainement");
 
-          // Mettez à jour les données du compte avec les entraînements mis à jour
+          // Mettre à jour les données du compte avec les entraînements mis à jour
           await _firestore.collection('comptes').document(idCpt).update({
             'entrainements': entrainements,
           });
@@ -698,29 +735,34 @@ class InMemoryComptesDataSource implements ComptesDataSource {
     }
   }
 
+/*
+mettre à jour le compte
+non utilisé 
+ */
   @override
   Future<Compte> update(String id, Compte cmpt) async {
     try {
-      // Instantiate a reference to the specific document in the 'comptes' collection
+      //reference du compte
       DocumentReference documentRef =
           Firestore.instance.collection('comptes').document(id);
 
-      // Update the document with the new data
+      // mettre a jour le doc firebase
       await documentRef.update({
         'email': cmpt.email,
         'passwordHash': cmpt.passwordHash,
-        // Add other fields as needed
       });
 
       return cmpt;
     } catch (e) {
-      // Handle errors
       print('Error updating account: $e');
       throw e;
     }
   }
-// Importez la classe Exercice
 
+/*
+récuperer l'exercice d'un compte et d'un entrainement donné
+utile pour changer le status après par exemple
+ */
   Future<Exercice?> getExerciceById(String id, int index, String idCpt) async {
     try {
       // Récupérez une référence au document Firebase correspondant à l'exercice
@@ -757,6 +799,9 @@ class InMemoryComptesDataSource implements ComptesDataSource {
     }
   }
 
+/*
+permet d'authentifier l'utilisateur pendant la connexion
+ */
   @override
   Future<bool> authenticateUser(String email, String password) async {
     var tokenStore = MyCustomTokenStore();
@@ -776,6 +821,9 @@ class InMemoryComptesDataSource implements ComptesDataSource {
     }
   }
 
+/*
+recuperer la reference firebase d'un compte à partir de l'adresse email
+*/
   @override
   Future<String?> getDocumentReferenceByEmail(String? email) async {
     try {
@@ -805,6 +853,9 @@ class InMemoryComptesDataSource implements ComptesDataSource {
     }
   }
 
+/*
+permet de deconnecter un utilisateur 
+ */
   @override
   Future<void> logoutUser() async {
     try {
@@ -815,6 +866,9 @@ class InMemoryComptesDataSource implements ComptesDataSource {
   }
 }
 
+/*
+gestion des token fait maison un peu bancale ^^ 
+*/
 class MyCustomTokenStore implements TokenStore {
   String? _token;
 

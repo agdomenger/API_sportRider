@@ -27,37 +27,36 @@ Future<Object> onRequest(RequestContext context) async {
   }
 }
 
+/*
+Permet de gerer la connection à l'app et de savoir si le compte existe
+fait appel à la fonction get de compte  */
 Future<Response> _getConnect(RequestContext context) async {
   try {
     final dataSource = context.read<ComptesDataSource>();
     final email = context.request.uri.queryParameters['email'];
     final password = context.request.uri.queryParameters['password'];
 
-    print("Handling GET request for authentication...");
-
     if (email != null && password != null) {
       print("Email: $email, Password: $password");
 
       try {
-        print("Authenticating user...");
+        print("Authentification...");
         bool isAuthenticated = await dataSource.authenticateUser(
           email.toString(),
           password.toString(),
         );
 
-        // Récupérer la référence du document correspondant à l'email
+        // Récupérer l'id de référence du document correspondant à l'email
         final docReference =
             await dataSource.getDocumentReferenceByEmail(email.toString());
 
         print("Authentication result: $isAuthenticated");
 
-        // Return a JSON response indicating authentication result and document reference
         return Response.json(body: {
           'authenticated': isAuthenticated,
           'documentReference': docReference,
         });
       } catch (e) {
-        // Handle authentication failure
         print("Authentication failed: $e");
         return Response(
           statusCode: HttpStatus.badRequest,
@@ -65,13 +64,12 @@ Future<Response> _getConnect(RequestContext context) async {
       }
     }
 
-    // Missing email or password in the query parameters
-    print("Email or password missing in the query parameters.");
+    // si pas les parametres
+    print("Email et/ou mot de passe non fournit");
     return Response(
       statusCode: HttpStatus.badRequest,
     );
   } catch (e) {
-    // Handle unexpected errors during request processing
     print("Error processing request: $e");
     return Response(
       statusCode: HttpStatus.internalServerError,

@@ -17,6 +17,9 @@ Future<dynamic> onRequest(RequestContext context) async {
   }
 }
 
+/*
+route permettant de créer une epreuve pour un compte et un équidé donné 
+*/
 Future<FutureOr<Response>> _postEpreuve(RequestContext context) async {
   final dataSource = context.read<ComptesDataSource>();
   try {
@@ -25,11 +28,9 @@ Future<FutureOr<Response>> _postEpreuve(RequestContext context) async {
     print(requestBody);
 
     if (requestBody.containsKey('compteId')) {
+      //paramettres essentiels pour la création de l'epreuve
       final dynamic compteIdDynamic = requestBody['compteId'];
-
       final dynamic chevalIdDynamic = requestBody['chevalId'];
-
-      // Perform a runtime type check (cast) to ensure it's a String
       if (compteIdDynamic is String && chevalIdDynamic is String) {
         final String compteId = compteIdDynamic;
         final String chevalId = chevalIdDynamic;
@@ -39,24 +40,18 @@ Future<FutureOr<Response>> _postEpreuve(RequestContext context) async {
                     ?.map((id) => id as String)
                     ?.toList() ??
                 [];
-
-        // You might want to validate the list of IDs here if needed
-
         return Response.json(
           statusCode: HttpStatus.created,
           body: await dataSource.addEpreuve(compteId, chevalId, epreuveIds),
         );
       } else {
-        // Handle the case where 'compteId' is not a String
         return Response(
           statusCode: HttpStatus.badRequest,
         );
       }
     } else {
       final epreuveJson = requestBody;
-      print(requestBody);
       final epreuve = Epreuve.fromJson(epreuveJson);
-
       return Response.json(
         statusCode: HttpStatus.created,
         body: await dataSource.createEpreuve(epreuve),
@@ -64,13 +59,15 @@ Future<FutureOr<Response>> _postEpreuve(RequestContext context) async {
     }
   } catch (e) {
     print(e);
-    // Handle JSON parsing or other errors
     return Response(
       statusCode: HttpStatus.badRequest,
     );
   }
 }
 
+/*
+permet de récupéré les epreuve du cheval relié au compte, les id des deux sont fournis 
+*/
 Future<Response> _getEpreuve(RequestContext context) async {
   try {
     final dataSource = context.read<ComptesDataSource>();
@@ -78,11 +75,8 @@ Future<Response> _getEpreuve(RequestContext context) async {
         (await context.request.json()) as Map<String, dynamic>;
     final chevalId = requestBody['chevalId'];
     final compteId = requestBody['compteId'];
-    // Ajoutez la logique pour récupérer la liste des épreuves
     final epreuves = await dataSource.readAllEpreuves(
         compteId.toString(), chevalId.toString());
-
-    // Vous pouvez ajuster la réponse en fonction de vos besoins
     return Response.json(body: epreuves);
   } catch (e) {
     print('Error getting epreuves: $e');
@@ -90,6 +84,10 @@ Future<Response> _getEpreuve(RequestContext context) async {
   }
 }
 
+/*
+permet de supprimer des epreuves 
+on fournit l'id du cheval et l'id de l'epreucve que l'on veut supprimer 
+ */
 Future<Response> _deleteEpreuve(RequestContext context) async {
   final Map<String, dynamic> requestBody =
       (await context.request.json()) as Map<String, dynamic>;
@@ -114,7 +112,6 @@ Future<Response> _deleteEpreuve(RequestContext context) async {
   }
 }
 
-
 /*
 Créer une épreuve : 
 curl --request POST \  --url http://localhost:8080/epreuve \
@@ -136,4 +133,4 @@ curl --request POST \  --url http://localhost:8080/epreuve \
     "epreuveIds": ["uQuMbOUkpAJkmG6y7F6r"]
 }'
 
-*/ 
+*/

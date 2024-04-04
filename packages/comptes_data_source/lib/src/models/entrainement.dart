@@ -3,6 +3,10 @@ import 'package:json_annotation/json_annotation.dart';
 
 part 'entrainement.g.dart';
 
+/*
+un entrainement contient : 
+obligatoirement un compte et une liste d'id d'exercices
+ */
 @JsonSerializable()
 class Entrainement {
   final String compteId;
@@ -20,8 +24,6 @@ class Entrainement {
         if (exerciceJson is Map<String, dynamic>) {
           return Exercice.fromJson(exerciceJson);
         } else {
-          // Gérer le cas où exerciceJson n'est pas une Map<String, dynamic>
-          // Par exemple, renvoyer un objet Exercice par défaut ou lever une erreur.
           throw FormatException('Invalid exercice data');
         }
       }).toList(),

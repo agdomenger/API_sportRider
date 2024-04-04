@@ -6,6 +6,9 @@ import 'package:meta/meta.dart';
 
 part 'epreuve.g.dart';
 
+/*
+Une épreuve est l'aliance entre un niveau, une discipline et une catégorie 
+ */
 @immutable
 @JsonSerializable()
 class Epreuve extends Equatable {
@@ -66,6 +69,7 @@ class Epreuve extends Equatable {
   }
 }
 
+/*Enumération des niveaux possibles */
 enum Niveau {
   un,
   deux,
@@ -74,6 +78,7 @@ enum Niveau {
   elite,
 }
 
+/*Enumération des disciplines existantes  */
 enum Discipline {
   cce,
   cso,
@@ -85,4 +90,5 @@ enum Discipline {
   ponyGame,
 }
 
+/*Enumération des catégories possibles */
 enum Categorie { amat, club, pro, debutant }

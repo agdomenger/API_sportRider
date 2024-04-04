@@ -18,6 +18,10 @@ FutureOr<Response> onRequest(RequestContext context) async {
   }
 }
 
+/*
+recuperer tous les evenements d'un compte 
+l'id du compte est necessaire
+ */
 Future<Response> _get(RequestContext context) async {
   final dataSource = context.read<ComptesDataSource>();
   final Map<String, dynamic> requestBody =
@@ -26,10 +30,13 @@ Future<Response> _get(RequestContext context) async {
   final String compteId = compteIdDynamic.toString();
 
   final events = await dataSource.readAllEvenements(compteId);
-  // Vous pouvez ajuster la réponse en fonction de vos besoins
   return Response.json(body: events);
 }
 
+/*
+créer un evenement et le lier à un compte 
+l'id du compte est necessaire 
+ */
 Future<Response> _post(RequestContext context) async {
   final dataSource = context.read<ComptesDataSource>();
   try {
@@ -42,27 +49,17 @@ Future<Response> _post(RequestContext context) async {
         requestBody['compteId'] is String) {
       final dynamic compteIdDynamic = requestBody['compteId'];
 
-      // Vérification du type 'String' pour 'compteId'
       if (compteIdDynamic is String) {
         final String compteId = compteIdDynamic;
-        print("okkkkkk");
 
         // Vérification de la présence de 'evenement' dans le corps de la requête
         if (requestBody.containsKey('evenement')) {
           final dynamic eventDynamic = requestBody['evenement'];
-          print("okkkkkk");
-          print("Event dynamic: $eventDynamic");
 
-          // Vérification de la nullité de 'eventDynamic' et du type 'Map<String, dynamic>'
           if (eventDynamic != null && eventDynamic is Map<String, dynamic>) {
-            // Conversion de 'eventDynamic' en objet Evenement
-            print("on passe ici");
             final Evenement event = Evenement.fromJson(eventDynamic);
-            print(event.toString());
-            // Vérification de la réussite de la conversion
             if (event != null) {
               print("on passe ici 2");
-              // Ajout de l'événement dans la source de données
               return Response.json(
                 statusCode: HttpStatus.created,
                 body: await dataSource.addEvenement(compteId, event),
@@ -84,9 +81,8 @@ Future<Response> _post(RequestContext context) async {
           return Response(
             statusCode: HttpStatus.badRequest,
           );
-        } // ... (le reste de la logique reste inchangé)
+        }
       } else {
-        // Handle the case where 'compteId' is not a String
         print('Invalid Compte ID');
         return Response(
           statusCode: HttpStatus.badRequest,
@@ -100,12 +96,11 @@ Future<Response> _post(RequestContext context) async {
     }
   } catch (e) {
     print('Error: $e');
-    // Handle JSON parsing or other errors
+
     return Response(
       statusCode: HttpStatus.badRequest,
     );
   }
 
-  // Ajoutez une déclaration 'throw' pour signaler que la fonction peut générer une exception non capturée
   throw Exception('Unexpected error in _post function');
 }
